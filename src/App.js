@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import MapView from "./MapView";
-
 const BASE_URL = "http://localhost:8080/stadium";
+
 
 function App() {
   // Crowd
@@ -23,6 +23,7 @@ function App() {
   const [dest, setDest] = useState("");
 
   const [output, setOutput] = useState("");
+  const [route, setRoute] = useState([]);
 
   // 🚶 Crowd API
   const updateCrowd = () => {
@@ -45,51 +46,130 @@ function App() {
       .catch(err => console.error(err));
   };
 
-  // 🚀 Get Route
-  const getRoute = () => {
-    axios.get(`${BASE_URL}/route?src=${src}&dest=${dest}`)
-      .then(res => {
-        setOutput("Best Route: " + res.data.join(" → "));
-      })
-      .catch(err => console.error(err));
-  };
+  // 🚀 Get Route (FIXED)
+const getRoute = () => {
+  axios.get(`${BASE_URL}/route?src=${src}&dest=${dest}`)
+    .then(res => {
+      const path = res.data;
+
+      // 🔥 THIS IS THE KEY CHANGE
+      setRoute(path);
+
+      // better output
+      setOutput(`🚀 Optimal Route: ${path.join(" → ")}`);
+    })
+    .catch(err => console.error(err));
+};
+
+  const cardStyle = {
+  border: "1px solid #eee",
+  borderRadius: "10px",
+  padding: "15px",
+  marginTop: "15px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+};
+
+const highlightCard = {
+  border: "2px solid #007bff",
+  borderRadius: "12px",
+  padding: "20px",
+  marginTop: "15px",
+  background: "#f8fbff"
+};
+
+const subText = {
+  fontSize: "12px",
+  color: "gray",
+  marginBottom: "10px"
+};
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>🏟️ Smart Stadium Dashboard</h1>
+  <div style={{ padding: "20px" }}>
 
-      {/* 🗺️ Map */}
-      <MapView />
+    {/* 🏟️ Heading */}
+    <h1 style={{
+      textAlign: "center",
+      fontSize: "32px",
+      marginBottom: "10px"
+    }}>
+      🏟️ Smart Stadium Intelligence System
+    </h1>
 
-      {/* 🚶 Crowd */}
-      <h3>Update Crowd</h3>
-      <input placeholder="Zone (A)" onChange={e => setZone(e.target.value)} />
-      <input placeholder="Density (100)" onChange={e => setDensity(e.target.value)} />
+    <p style={{ textAlign: "center", color: "gray", marginBottom: "20px" }}>
+      Real-time crowd monitoring • Smart routing • Queue optimization
+    </p>
+
+    {/* 🗺️ Map */}
+    <MapView route={route} />
+
+    {/* 🚶 Crowd Control */}
+    <div style={cardStyle}>
+      <h3>🚶 Live Crowd Control</h3>
+      <p style={subText}>Update real-time crowd density</p>
+
+      <input
+        placeholder="Zone (A)"
+        value={zone}
+        onChange={(e) => setZone(e.target.value)}
+      />
+
+      <input
+        placeholder="Density (100)"
+        value={density}
+        onChange={(e) => setDensity(e.target.value)}
+      />
+
       <button onClick={updateCrowd}>Update</button>
-
-      {/* ⏱️ Queue */}
-      <h3>Add Queue</h3>
-      <input placeholder="Location (Food1)" onChange={e => setLoc(e.target.value)} />
-      <input placeholder="People" onChange={e => setPeople(e.target.value)} />
-      <input placeholder="Service Time" onChange={e => setServiceTime(e.target.value)} />
-      <button onClick={updateQueue}>Update</button>
-
-      {/* 🧭 Path */}
-      <h3>Add Path</h3>
-      <input placeholder="From" onChange={e => setFrom(e.target.value)} />
-      <input placeholder="To" onChange={e => setTo(e.target.value)} />
-      <input placeholder="Weight" onChange={e => setWeight(e.target.value)} />
-      <button onClick={addPath}>Add</button>
-
-      {/* 🚀 Route */}
-      <h3>Find Route</h3>
-      <input placeholder="Source" onChange={e => setSrc(e.target.value)} />
-      <input placeholder="Destination" onChange={e => setDest(e.target.value)} />
-      <button onClick={getRoute}>Find</button>
-
-      <h3 style={{ marginTop: "20px", color: "green" }}>{output}</h3>
     </div>
-  );
+
+    {/* 🍔 Queue */}
+    <div style={cardStyle}>
+      <h3>🍔 Queue Monitoring</h3>
+      <p style={subText}>Manage waiting times</p>
+
+      <input
+        placeholder="Location (Food1)"
+        onChange={(e) => setLoc(e.target.value)}
+      />
+
+      <input
+        placeholder="People"
+        onChange={(e) => setPeople(e.target.value)}
+      />
+
+      <input
+        placeholder="Service Time"
+        onChange={(e) => setServiceTime(e.target.value)}
+      />
+
+      <button onClick={updateQueue}>Update</button>
+    </div>
+
+    {/* 🧭 Path */}
+    <div style={cardStyle}>
+      <h3>🧭 Stadium Navigation Setup</h3>
+
+      <input placeholder="From" onChange={(e) => setFrom(e.target.value)} />
+      <input placeholder="To" onChange={(e) => setTo(e.target.value)} />
+      <input placeholder="Weight" onChange={(e) => setWeight(e.target.value)} />
+
+      <button onClick={addPath}>Add</button>
+    </div>
+
+    {/* 🚀 Route */}
+    <div style={highlightCard}>
+      <h3>🚀 Smart Route Finder</h3>
+
+      <input placeholder="Source" onChange={(e) => setSrc(e.target.value)} />
+      <input placeholder="Destination" onChange={(e) => setDest(e.target.value)} />
+
+      <button onClick={getRoute}>Find Optimal Route</button>
+
+      <p style={{ marginTop: "10px", color: "green" }}>{output}</p>
+    </div>
+
+  </div>
+);
 }
 
 export default App;
