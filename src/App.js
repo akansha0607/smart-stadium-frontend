@@ -1,8 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import MapView from "./MapView";
-const BASE_URL = "https://smart-stadium-backend-101294621882.asia-south1.run.app/stadium/crowd";
-
+const BASE_URL = "https://smart-stadium-backend-101294621882.asia-south1.run.app/stadium";
 
 function App() {
   // Crowd
